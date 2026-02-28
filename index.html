@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>я сучка · личная страница</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..900;1,14..32,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(145deg, #f9a8d4 0%, #f472b6 30%, #c084fc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: #1e0a2b;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 48px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.35);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.01);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, #a21caf, #db2777, #e11d48);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 4px 4px 0 rgba(255, 255, 255, 0.5);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+            word-break: break-word;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #831843;
+            background: rgba(255, 255, 255, 0.6);
+            display: inline-block;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid white;
+        }
+
+        .avatar {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(45deg, #ec4899, #a855f7);
+            border-radius: 50%;
+            margin: 1.5rem auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid white;
+            box-shadow: 0 15px 25px -8px rgba(236, 72, 153, 0.5);
+        }
+
+        .avatar i {
+            font-size: 5rem;
+            color: white;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+        }
+
+        .bio {
+            background: white;
+            border-radius: 32px;
+            padding: 1.8rem;
+            margin: 2rem 0 2rem;
+            box-shadow: 0 8px 20px rgba(219, 39, 119, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-align: center;
+            font-weight: 500;
+            color: #2d0a31;
+        }
+
+        .bio p {
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .traits {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 32px;
+            padding: 1.8rem 2rem;
+            margin: 1.8rem 0;
+            border: 2px solid rgba(255, 215, 235, 0.9);
+        }
+
+        .traits h2, .social h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #831843;
+        }
+
+        .traits ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem 1.5rem;
+        }
+
+        .traits li {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 60px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border: 2px solid #fbcfe8;
+        }
+
+        .traits li::before {
+            content: "🐕‍🦺";
+            font-size: 1.5rem;
+            filter: drop-shadow(0 2px 2px #f472b6);
+        }
+
+        .social {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 32px;
+            padding: 1.8rem 2rem;
+            margin: 1.8rem 0;
+            border: 2px solid white;
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            justify-content: center;
+        }
+
+        .links a {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #9d174d;
+            border: 2px solid #f9a8d4;
+            box-shadow: 0 8px 0 #be185d;
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex: 0 1 auto;
+        }
+
+        .links a:hover {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #be185d;
+            background: #fdf2f8;
+        }
+
+        .links a i {
+            font-size: 1.5rem;
+            color: #c2410c;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6b1e4a;
+            border-top: 2px dashed #f9a8d4;
+            padding-top: 1.5rem;
+        }
+
+        /* маленькие украшательства */
+        .emoji-big {
+            font-size: 2rem;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 3rem; }
+            .container { padding: 1.8rem 1.2rem; }
+            .traits ul { grid-template-columns: 1fr; }
+            .links a { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>я сучка</h1>
+            <div class="subtitle">✦ горжусь этим ✦</div>
+        </header>
+
+        <!-- аватарка / иконка -->
+        <div class="avatar">
+            <i class="fas fa-crown"></i>  <!-- корона вместо возможной обидной картинки -->
+        </div>
+
+        <!-- короткое "био" -->
+        <section class="bio">
+            <p>
+                🐾 Привет, я — та самая сучка. Кодирую, виляю хвостом, 
+                украшаю этот мир (и иногда кусаю баги). 
+                Здесь всё по-настоящему, без цензуры.
+            </p>
+        </section>
+
+        <!-- список качеств (с юмором) -->
+        <section class="traits">
+            <h2><i class="fas fa-paw"></i> Мои сучечьи доблести</h2>
+            <ul>
+                <li>всегда добиваюсь своего</li>
+                <li>обожаю макароны с сыром</li>
+                <li>пишу чистый код (иногда)</li>
+                <li>лаю на спам-звонки</li>
+                <li>королева драмы</li>
+                <li>ночью превращаюсь в дизайнера</li>
+            </ul>
+        </section>
+
+        <!-- контакты / соцсети (замени ссылки на свои) -->
+        <section class="social">
+            <h2><i class="fas fa-link"></i> где найти (если не рычу)</h2>
+            <div class="links">
+                <a href="#" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="#" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="#" target="_blank"><i class="fab fa-instagram"></i> Insta</a>
+                <a href="#" target="_blank"><i class="fas fa-envelope"></i> Bark</a>
+            </div>
+        </section>
+
+        <!-- футер с шуткой -->
+        <footer>
+            <p>© 2025 — я сучка inc. 🐩  Все права защипаны. <br> <span style="opacity: 0.7;">(сайт создан с любовью и наглостью)</span></p>
+        </footer>
+    </div>
+</body>
+</html>
