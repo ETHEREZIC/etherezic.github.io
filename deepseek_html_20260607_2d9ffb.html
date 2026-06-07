@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вставка ссылок из буфера</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 32px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .warning-banner {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px 20px;
+            margin: 20px 32px 0 32px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            color: #92400e;
+        }
+
+        .warning-banner code {
+            background: #fff3e0;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .method-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .method-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e293b;
+        }
+
+        .method-desc {
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            margin-top: 8px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        #urlInput {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        #urlInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .clipboard-preview {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            transition: all 0.2s;
+        }
+
+        .clipboard-preview.link {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .preview-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .preview-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            color: #1e293b;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #e2e8f0;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        hr {
+            margin: 24px 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #e2e8f0, transparent);
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 12px;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        @keyframes flash {
+            0%, 100% { background-color: #d1fae5; }
+            50% { background-color: #a7f3d0; }
+        }
+
+        .flash {
+            animation: flash 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>
+            📋 Вставка ссылок
+        </h1>
+        <p style="margin-top: 8px; opacity: 0.9;">Автоматическое распознавание и вставка URL из буфера</p>
+    </div>
+
+    <div class="warning-banner" id="warningBanner">
+        ⚠️ <strong>Внимание!</strong> Вы открыли файл через <code>file://</code> протокол.<br>
+        Браузеры блокируют автоматическое чтение буфера для локальных файлов.<br><br>
+        ✅ <strong>Как исправить:</strong><br>
+        1. Используйте <strong>Ctrl+V</strong> в поле ввода (это работает всегда)<br>
+        2. Или запустите локальный сервер:<br>
+        <code style="display: inline-block; margin-top: 8px;"># Python: python -m http.server 8080</code><br>
+        <code># Node: npx http-server</code><br>
+        <code># VS Code: установите "Live Server"</code>
+    </div>
+
+    <div class="content">
+        <div class="method-card">
+            <div class="method-title">
+                🎯 Способ 1: Ctrl+V (работает всегда)
+            </div>
+            <div class="method-desc">
+                Скопируйте любую ссылку и нажмите <strong>Ctrl+V</strong> (или Cmd+V на Mac) в поле ниже.<br>
+                Ссылка будет автоматически распознана и вставлена.
+            </div>
+            <div class="input-group">
+                <label>🔗 Поле для ввода ссылки</label>
+                <div class="input-wrapper">
+                    <input type="text" id="urlInput" placeholder="Нажмите Ctrl+V чтобы вставить ссылку..." autocomplete="off">
+                    <button class="btn btn-secondary" id="clearBtn">Очистить</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="method-card">
+            <div class="method-title">
+                📋 Последняя вставленная ссылка
+            </div>
+            <div class="clipboard-preview" id="clipboardPreview">
+                <div class="preview-label">🔍 Распознанная ссылка</div>
+                <div class="preview-content" id="lastUrlContent">
+                    Пока ничего не вставлено
+                </div>
+            </div>
+            <div class="status-text" id="statusText">
+                💡 Скопируйте ссылку и нажмите Ctrl+V в поле выше
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="method-card">
+            <div class="method-title">
+                🚀 Способ 2: Альтернативный метод (требуется сервер)
+            </div>
+            <div class="method-desc">
+                Если вы <strong>запустите страницу через локальный сервер</strong> (не file://), то будет работать<br>
+                автоматическое отслеживание буфера — достаточно скопировать ссылку, и она сама вставится!
+            </div>
+            <div style="background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 12px; font-family: monospace; font-size: 0.8rem;">
+                <span style="color: #a78bfa;"># Как запустить сервер:</span><br>
+                • <span style="color: #86efac;">Python 3:</span> python -m http.server 8080<br>
+                • <span style="color: #86efac;">Python 2:</span> python -m SimpleHTTPServer 8080<br>
+                • <span style="color: #86efac;">Node.js:</span> npx http-server<br>
+                • <span style="color: #86efac;">VS Code:</span> установите расширение "Live Server"<br>
+                <span style="color: #94a3b8;"># Затем откройте http://localhost:8080</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DOM элементы
+    const urlInput = document.getElementById('urlInput');
+    const lastUrlContent = document.getElementById('lastUrlContent');
+    const clipboardPreview = document.getElementById('clipboardPreview');
+    const clearBtn = document.getElementById('clearBtn');
+    const statusText = document.getElementById('statusText');
+    const warningBanner = document.getElementById('warningBanner');
+
+    // Проверяем, открыт ли файл через file://
+    const isFileProtocol = window.location.protocol === 'file:';
+    
+    if (!isFileProtocol) {
+        // Если не file://, то показываем оптимистичный статус и пробуем использовать Clipboard API
+        warningBanner.style.background = '#dcfce7';
+        warningBanner.style.borderLeftColor = '#10b981';
+        warningBanner.innerHTML = `
+            ✅ <strong>Отлично!</strong> Вы открыли страницу через HTTP сервер.<br>
+            🎉 Доступно автоматическое чтение буфера! Просто скопируйте ссылку (Ctrl+C) и она сама вставится через 2 секунды.
+        `;
+        statusText.innerHTML = '✨ Авто-режим активен! Скопируйте ссылку в любом месте → она появится в поле через 2 секунды';
+        
+        // Запускаем авто-мониторинг (только для HTTP/HTTPS)
+        initAutoMonitoring();
+    } else {
+        statusText.innerHTML = '🔒 Режим file://: используйте Ctrl+V для вставки. Для авто-режима запустите локальный сервер (см. инструкцию выше)';
+        clipboardPreview.classList.remove('link');
+        lastUrlContent.innerHTML = '⏳ Ожидание вставки через Ctrl+V...';
+    }
+
+    // Функция проверки валидности URL
+    function isValidUrl(str) {
+        if (!str || typeof str !== 'string') return false;
+        const trimmed = str.trim();
+        if (trimmed.length === 0) return false;
+        
+        // Протоколы
+        if (/^(https?:\/\/|ftp:\/\/|file:\/\/)/i.test(trimmed)) return true;
+        
+        // www.
+        if (/^www\.[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}/i.test(trimmed)) return true;
+        
+        // Домен с TLD
+        const domainPattern = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
+        if (domainPattern.test(trimmed)) return true;
+        
+        // IP адрес
+        const ipPattern = /^(\d{1,3}\.){3}\d{1,3}(:\d+)?(\/.*)?$/;
+        if (ipPattern.test(trimmed)) return true;
+        
+        // Попытка через URL конструктор
+        try {
+            let testUrl = trimmed;
+            if (!testUrl.startsWith('http://') && !testUrl.startsWith('https://')) {
+                testUrl = 'https://' + testUrl;
+            }
+            new URL(testUrl);
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+
+    // Обновление UI при вставке ссылки
+    function updateUIWithUrl(url) {
+        if (!url || url === '') return false;
+        
+        const trimmedUrl = url.trim();
+        const isLink = isValidUrl(trimmedUrl);
+        
+        if (isLink) {
+            // Вставляем в поле ввода
+            urlInput.value = trimmedUrl;
+            
+            // Обновляем превью
+            lastUrlContent.textContent = trimmedUrl.length > 100 ? trimmedUrl.slice(0, 100) + '...' : trimmedUrl;
+            clipboardPreview.classList.add('link');
+            
+            // Визуальный фидбек
+            urlInput.classList.add('flash');
+            setTimeout(() => {
+                urlInput.classList.remove('flash');
+            }, 300);
+            
+            // Обновляем статус
+            statusText.innerHTML = '✅ Ссылка распознана и вставлена: ' + (trimmedUrl.length > 50 ? trimmedUrl.slice(0, 50) + '...' : trimmedUrl);
+            
+            return true;
+        } else if (trimmedUrl !== '') {
+            // Не ссылка
+            lastUrlContent.textContent = '❌ Не ссылка: ' + (trimmedUrl.length > 80 ? trimmedUrl.slice(0, 80) + '...' : trimmedUrl);
+            clipboardPreview.classList.remove('link');
+            statusText.innerHTML = '⚠️ Скопированный текст не является ссылкой';
+            return false;
+        }
+        
+        return false;
+    }
+
+    // Обработчик события paste на поле ввода (работает всегда!)
+    urlInput.addEventListener('paste', (e) => {
+        // Немного ждём, чтобы значение успело появиться в поле
+        setTimeout(() => {
+            const pastedText = urlInput.value;
+            if (pastedText) {
+                updateUIWithUrl(pastedText);
+            }
+        }, 10);
+    });
+
+    // Очистка поля
+    clearBtn.addEventListener('click', () => {
+        urlInput.value = '';
+        lastUrlContent.textContent = 'Поле очищено';
+        clipboardPreview.classList.remove('link');
+        statusText.innerHTML = '💡 Поле очищено. Скопируйте ссылку и нажмите Ctrl+V';
+        urlInput.focus();
+    });
+
+    // Функции для авто-мониторинга (только для HTTP/HTTPS)
+    async function readClipboard() {
+        if (!navigator.clipboard || !navigator.clipboard.readText) {
+            return false;
+        }
+        
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text && text.trim()) {
+                const trimmed = text.trim();
+                if (isValidUrl(trimmed)) {
+                    updateUIWithUrl(trimmed);
+                    return true;
+                }
+            }
+        } catch (err) {
+            // Без разрешения - ничего не делаем
+            if (err.name !== 'NotAllowedError') {
+                console.log('Ошибка чтения буфера:', err);
+            }
+        }
+        return false;
+    }
+
+    function initAutoMonitoring() {
+        // Сначала запрашиваем разрешение (один раз по клику на страницу)
+        let permissionRequested = false;
+        
+        async function requestAndStart() {
+            if (permissionRequested) return;
+            permissionRequested = true;
+            
+            try {
+                // Пытаемся прочитать - браузер запросит разрешение
+                await navigator.clipboard.readText();
+                statusText.innerHTML = '✅ Доступ к буферу получен! Теперь просто копируйте ссылки - они будут автоматически вставляться';
+                
+                // Запускаем интервал проверки
+                setInterval(async () => {
+                    await readClipboard();
+                }, 2000);
+                
+            } catch (err) {
+                statusText.innerHTML = '⚠️ Для авто-режима нажмите на эту область и разрешите доступ к буферу';
+                // При клике на body повторяем запрос
+                document.body.addEventListener('click', async () => {
+                    if (!permissionRequested) {
+                        await requestAndStart();
+                    }
+                }, { once: true });
+            }
+        }
+        
+        // Запускаем при первом взаимодействии
+        document.body.addEventListener('click', async () => {
+            if (!permissionRequested) {
+                await requestAndStart();
+            }
+        }, { once: true });
+        
+        statusText.innerHTML = '👆 Нажмите в любом месте страницы, чтобы включить авто-мониторинг буфера';
+    }
+
+    // Дополнительно: глобальное отслеживание Ctrl+V на всей странице
+    document.addEventListener('paste', (e) => {
+        // Если целевой элемент не наше поле, всё равно обрабатываем
+        setTimeout(() => {
+            // Проверяем, не вставилось ли что-то в поле
+            if (urlInput.value && document.activeElement !== urlInput) {
+                // Если вставка была не в поле, но ссылка есть в буфере
+                const pastedText = e.clipboardData?.getData('text');
+                if (pastedText && isValidUrl(pastedText)) {
+                    updateUIWithUrl(pastedText);
+                }
+            }
+        }, 10);
+    });
+</script>
+</body>
+</html>
